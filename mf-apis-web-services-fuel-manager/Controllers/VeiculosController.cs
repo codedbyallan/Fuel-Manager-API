@@ -19,18 +19,32 @@ namespace mf_apis_web_services_fuel_manager.Controllers
         public async Task<ActionResult> GetAll()
         {
             var model = await _context.Veiculos.ToListAsync();
+
+            foreach (var item in model)
+            {
+                GerarLinks(item);
+            }
+
             return Ok(model);
         }
+
         [HttpPost]
         public async Task<ActionResult> Create(Veiculo model)
         {
             if (model.AnoFabricacao <= 0 || model.AnoModelo <= 0)
             {
-                return BadRequest(new { message = "Ano de fabricação e Ano do modelo são obrigatórios e devem ser maiores que zero" });
+                return BadRequest(new
+                {
+                    message = "Ano de fabricação e Ano do modelo são obrigatórios e devem ser maiores que zero"
+                });
             }
+
             _context.Veiculos.Add(model);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("GetById", new { id = model.Id }, model);
+
+            GerarLinks(model);
+
+            return CreatedAtAction(nameof(GetById), new { id = model.Id }, model);
         }
 
         [HttpGet("{id}")]
@@ -73,9 +87,25 @@ namespace mf_apis_web_services_fuel_manager.Controllers
 
         private void GerarLinks(Veiculo model)
         {
-            model.Links.Add(new LinkDto(model.Id,Url.ActionLink() , rel: "self", metodo: "GET"));
-            model.Links.Add(new LinkDto(model.Id,Url.ActionLink() , rel: "update", metodo: "PUT"));
-            model.Links.Add(new LinkDto(model.Id,Url.ActionLink() , rel: "delete", metodo: "DELETE"));
+            model.Links.Clear();
+
+            var idObj = new { id = model.Id };
+
+            model.Links.Add(new LinkDto(model.Id,
+                Url.ActionLink(nameof(GetById), values: idObj),
+                "self", "GET"));
+
+            model.Links.Add(new LinkDto(model.Id,
+                Url.ActionLink(nameof(GetById), values: idObj),
+                "update", "PUT"));
+
+            model.Links.Add(new LinkDto(model.Id,
+                Url.ActionLink(nameof(GetById), values: idObj),
+                "delete", "DELETE"));
+
+            model.Links.Add(new LinkDto(model.Id,
+                Url.ActionLink(nameof(Create)),
+                "create", "POST"));
         }
 
     }
