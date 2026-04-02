@@ -1,4 +1,5 @@
-﻿using mf_apis_web_services_fuel_manager.Models;
+﻿using System.Security.Claims;
+using mf_apis_web_services_fuel_manager.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +62,7 @@ namespace mf_apis_web_services_fuel_manager.Controllers
             GerarLinks(model);
             return Ok(model);
         }
-
+            
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, Veiculo model)
         {
@@ -76,7 +77,7 @@ namespace mf_apis_web_services_fuel_manager.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

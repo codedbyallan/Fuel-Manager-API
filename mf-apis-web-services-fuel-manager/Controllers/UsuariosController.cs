@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace mf_apis_web_services_fuel_manager.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase
